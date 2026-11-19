@@ -1,6 +1,38 @@
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 function esIdValido(valor) {
   const id = Number(valor);
   return Number.isInteger(id) && id > 0;
+}
+
+function validarRegistro(cuerpo) {
+  const errores = [];
+  const nombre = typeof cuerpo.nombre === 'string' ? cuerpo.nombre.trim() : '';
+  const email = typeof cuerpo.email === 'string' ? cuerpo.email.trim() : '';
+  const password = typeof cuerpo.password === 'string' ? cuerpo.password : '';
+
+  if (!nombre) errores.push({ campo: 'nombre', mensaje: 'Es obligatorio' });
+  else if (nombre.length > 100) errores.push({ campo: 'nombre', mensaje: 'No puede superar 100 caracteres' });
+
+  if (!email) errores.push({ campo: 'email', mensaje: 'Es obligatorio' });
+  else if (!EMAIL_RE.test(email)) errores.push({ campo: 'email', mensaje: 'Debe ser un correo válido' });
+
+  if (!password) errores.push({ campo: 'password', mensaje: 'Es obligatorio' });
+  else if (password.length < 8) errores.push({ campo: 'password', mensaje: 'Debe tener al menos 8 caracteres', status: 422 });
+
+  const status = errores.length === 1 && errores[0].status === 422 ? 422 : 400;
+  return { errores, datos: { nombre, email, password }, status };
+}
+
+function validarLogin(cuerpo) {
+  const errores = [];
+  const email = typeof cuerpo.email === 'string' ? cuerpo.email.trim() : '';
+  const password = typeof cuerpo.password === 'string' ? cuerpo.password : '';
+
+  if (!email || !EMAIL_RE.test(email)) errores.push({ campo: 'email', mensaje: 'Debe ser un correo válido' });
+  if (!password) errores.push({ campo: 'password', mensaje: 'Es obligatorio' });
+
+  return { errores, datos: { email, password } };
 }
 
 function validarProducto(cuerpo) {
@@ -30,8 +62,7 @@ function validarProducto(cuerpo) {
   }
 
   const status = errores.some((e) => e.status === 422) && errores.length === 1 ? 422 : 400;
-  const datos = { nombre, descripcion, categoria, precio };
-  return { errores, datos, status };
+  return { errores, datos: { nombre, descripcion, categoria, precio }, status };
 }
 
-module.exports = { esIdValido, validarProducto };
+module.exports = { esIdValido, validarRegistro, validarLogin, validarProducto };
