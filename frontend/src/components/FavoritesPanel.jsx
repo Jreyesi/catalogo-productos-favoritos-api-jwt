@@ -1,3 +1,5 @@
+import { imagenProducto } from '../productImages.js';
+
 export default function FavoritesPanel({ favoritos, onQuitar, usuario }) {
   return (
     <aside className="panel panel--favoritos" aria-label="Mis favoritos">
@@ -10,7 +12,10 @@ export default function FavoritesPanel({ favoritos, onQuitar, usuario }) {
         <ul className="lista-favoritos">
           {favoritos.map((producto) => (
             <li key={producto.id}>
-              <span>{producto.nombre}</span>
+              <span className="favorito__nombre">
+                <img src={imagenProducto(producto)} alt="" loading="lazy" />
+                {producto.nombre}
+              </span>
               <button type="button" className="enlace" onClick={() => onQuitar(producto.id)}>
                 Quitar
               </button>

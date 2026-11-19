@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Envase de Pre Workout Pump X">
+  <defs>
+    <linearGradient id="pump" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c3aed"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="360" rx="124" ry="16" fill="#050807" opacity="0.55"/>
+  <rect x="112" y="88" width="176" height="248" rx="26" fill="url(#pump)"/>
+  <rect x="104" y="62" width="192" height="48" rx="16" fill="#0b1020"/>
+  <rect x="100" y="72" width="200" height="12" rx="6" fill="#4c1d95"/>
+  <rect x="130" y="132" width="140" height="164" rx="14" fill="#f5f3ff"/>
+  <rect x="130" y="132" width="140" height="10" fill="#6d28d9"/>
+  <text x="200" y="178" text-anchor="middle" font-family="Segoe UI, Arial" font-size="20" letter-spacing="3" fill="#6d28d9">PRE WORKOUT</text>
+  <text x="200" y="226" text-anchor="middle" font-family="Segoe UI, Arial" font-size="40" font-weight="700" fill="#4c1d95">PUMP X</text>
+  <path d="M156 248h88" stroke="#c4b5fd" stroke-width="2"/>
+  <text x="200" y="276" text-anchor="middle" font-family="Segoe UI, Arial" font-size="13" fill="#6b7280">BETA-ALANINA + CITRULINA</text>
+  <text x="200" y="332" text-anchor="middle" font-family="Segoe UI, Arial" font-size="22" font-weight="700" fill="#f5f3ff">300 g</text>
+</svg>

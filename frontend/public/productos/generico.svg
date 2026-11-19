@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Producto generico de suplemento">
+  <ellipse cx="200" cy="350" rx="110" ry="15" fill="#050807" opacity="0.55"/>
+  <rect x="126" y="96" width="148" height="236" rx="24" fill="#1f2937"/>
+  <rect x="118" y="72" width="164" height="44" rx="14" fill="#374151"/>
+  <rect x="142" y="140" width="116" height="150" rx="12" fill="#0b1220"/>
+  <path d="M170 215h60M188 197v36M212 197v36" stroke="#b8f24a" stroke-width="10" stroke-linecap="round"/>
+  <text x="200" y="320" text-anchor="middle" font-family="Segoe UI, Arial" font-size="18" fill="#9aa6b2">SUPLEMENTO</text>
+</svg>

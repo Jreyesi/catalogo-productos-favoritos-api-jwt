@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Envase de proteina whey isolate sabor chocolate">
+  <defs>
+    <linearGradient id="proteina" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b5a3c"/>
+      <stop offset="1" stop-color="#3b2216"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="360" rx="124" ry="16" fill="#050807" opacity="0.55"/>
+  <rect x="112" y="88" width="176" height="248" rx="26" fill="url(#proteina)"/>
+  <rect x="104" y="62" width="192" height="48" rx="16" fill="#2a1710"/>
+  <rect x="100" y="72" width="200" height="12" rx="6" fill="#5a3926"/>
+  <rect x="130" y="132" width="140" height="164" rx="14" fill="#f3e9df"/>
+  <rect x="130" y="132" width="140" height="10" fill="#7b4a2d"/>
+  <text x="200" y="176" text-anchor="middle" font-family="Segoe UI, Arial" font-size="30" font-weight="700" fill="#3b2216">WHEY</text>
+  <text x="200" y="204" text-anchor="middle" font-family="Segoe UI, Arial" font-size="20" letter-spacing="3" fill="#8b5a3c">ISOLATE</text>
+  <path d="M154 224h92" stroke="#c2a186" stroke-width="2"/>
+  <text x="200" y="258" text-anchor="middle" font-family="Segoe UI, Arial" font-size="17" fill="#5a3926">CHOCOLATE</text>
+  <text x="200" y="282" text-anchor="middle" font-family="Segoe UI, Arial" font-size="13" fill="#8b6c58">24 g PROTEINA</text>
+  <text x="200" y="330" text-anchor="middle" font-family="Segoe UI, Arial" font-size="22" font-weight="700" fill="#f3e9df">900 g</text>
+</svg>

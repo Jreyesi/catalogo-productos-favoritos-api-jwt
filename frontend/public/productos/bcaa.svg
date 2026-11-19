@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="Envase de BCAA 8 a 1 a 1 recovery">
+  <defs>
+    <linearGradient id="bcaa" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="200" cy="360" rx="112" ry="16" fill="#050807" opacity="0.55"/>
+  <path d="M150 108h100l18 34v188a20 20 0 0 1-20 20h-96a20 20 0 0 1-20-20V142z" fill="url(#bcaa)"/>
+  <rect x="156" y="64" width="88" height="48" rx="14" fill="#e6f7ff"/>
+  <rect x="150" y="112" width="100" height="12" rx="6" fill="#0c4a6e"/>
+  <rect x="142" y="160" width="116" height="150" rx="12" fill="#082f49"/>
+  <text x="200" y="204" text-anchor="middle" font-family="Segoe UI, Arial" font-size="34" font-weight="700" fill="#7dd3fc">BCAA</text>
+  <text x="200" y="234" text-anchor="middle" font-family="Segoe UI, Arial" font-size="22" font-weight="700" fill="#e0f2fe">8:1:1</text>
+  <path d="M162 252h76" stroke="#155e75" stroke-width="2"/>
+  <text x="200" y="282" text-anchor="middle" font-family="Segoe UI, Arial" font-size="15" letter-spacing="2" fill="#bae6fd">RECOVERY</text>
+  <text x="200" y="334" text-anchor="middle" font-family="Segoe UI, Arial" font-size="19" fill="#e0f2fe">250 g</text>
+</svg>
