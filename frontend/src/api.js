@@ -29,5 +29,5 @@ export const api = {
   listarFavoritos: () => pedir('/favoritos'),
   agregarFavorito: (productoId) =>
     pedir('/favoritos', { method: 'POST', body: JSON.stringify({ productoId }) }),
-  quitarFavorito: (productoId) => pedir(`/favoritos/${productoId}`, { method: 'DELETE' })
+  quitarFavorito: (productoId) => pedir(`/favoritos/${productoId}`, { method: 'DELETE' }),
 };

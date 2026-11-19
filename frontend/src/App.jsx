@@ -1,30 +1,31 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { api } from './api.js';
-import Header from './components/Header.jsx';
-import AuthForm from './components/AuthForm.jsx';
-import ProductCard from './components/ProductCard.jsx';
+import AuthModal from './components/AuthModal.jsx';
+import BentoGrid from './components/BentoGrid.jsx';
+import CartDrawer from './components/CartDrawer.jsx';
 import FavoritesPanel from './components/FavoritesPanel.jsx';
-import { imagenProducto } from './productImages.js';
+import FilterToolbar from './components/FilterToolbar.jsx';
+import Footer from './components/Footer.jsx';
+import Header from './components/Header.jsx';
+import MacroModal from './components/MacroModal.jsx';
+import ProductCard from './components/ProductCard.jsx';
+import Toast from './components/Toast.jsx';
+import usePersistentState from './hooks/usePersistentState.js';
 
 export default function App() {
+  const [catalogo, setCatalogo] = useState([]);
   const [productos, setProductos] = useState([]);
   const [categoria, setCategoria] = useState('');
+  const [query, setQuery] = useState('');
   const [favoritos, setFavoritos] = useState([]);
   const [usuario, setUsuario] = useState(null);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(true);
-
-  const cargarProductos = useCallback(async () => {
-    setCargando(true);
-    try {
-      setProductos(await api.listarProductos(categoria));
-      setError('');
-    } catch (fallo) {
-      setError(fallo.message);
-    } finally {
-      setCargando(false);
-    }
-  }, [categoria]);
+  const [carrito, setCarrito] = usePersistentState('ironpulse_cart', []);
+  const [carritoAbierto, setCarritoAbierto] = useState(false);
+  const [authAbierto, setAuthAbierto] = useState(false);
+  const [productoDetalle, setProductoDetalle] = useState(null);
+  const [toast, setToast] = useState('');
 
   const cargarFavoritos = useCallback(async () => {
     if (!localStorage.getItem('token')) {
@@ -39,8 +40,36 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    cargarProductos();
-  }, [cargarProductos]);
+    let activo = true;
+    api.listarProductos()
+      .then((datos) => {
+        if (activo) setCatalogo(datos);
+      })
+      .catch((fallo) => {
+        if (activo) setError(fallo.message);
+      });
+    return () => { activo = false; };
+  }, []);
+
+  useEffect(() => {
+    let activo = true;
+    setCargando(true);
+    api.listarProductos(categoria)
+      .then((datos) => {
+        if (!activo) return;
+        setProductos(datos);
+        setError('');
+      })
+      .catch((fallo) => {
+        if (!activo) return;
+        setProductos([]);
+        setError(fallo.message);
+      })
+      .finally(() => {
+        if (activo) setCargando(false);
+      });
+    return () => { activo = false; };
+  }, [categoria]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -50,6 +79,27 @@ export default function App() {
       cargarFavoritos();
     }
   }, [cargarFavoritos]);
+
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = window.setTimeout(() => setToast(''), 2600);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
+
+  const categorias = useMemo(
+    () => ['Todos', ...new Set(catalogo.map((producto) => producto.categoria))],
+    [catalogo],
+  );
+
+  const resultados = useMemo(() => {
+    const termino = query.trim().toLowerCase();
+    return productos.filter((producto) => {
+      const texto = `${producto.nombre} ${producto.categoria} ${producto.descripcion}`.toLowerCase();
+      return !termino || texto.includes(termino);
+    });
+  }, [productos, query]);
+
+  const cartCount = carrito.reduce((sum, item) => sum + item.qty, 0);
 
   async function autenticar({ nombre, email, password, registro }) {
     try {
@@ -61,7 +111,9 @@ export default function App() {
       localStorage.setItem('usuario', JSON.stringify(sesion.usuario));
       setUsuario(sesion.usuario);
       await cargarFavoritos();
+      setAuthAbierto(false);
       setError('');
+      setToast(`Bienvenido, ${sesion.usuario.nombre}`);
     } catch (fallo) {
       setError(fallo.message);
     }
@@ -72,11 +124,14 @@ export default function App() {
     localStorage.removeItem('usuario');
     setUsuario(null);
     setFavoritos([]);
+    setAuthAbierto(false);
+    setToast('Sesión cerrada');
   }
 
   async function alternarFavorito(productoId) {
     if (!usuario) {
       setError('Inicia sesion para usar favoritos');
+      setAuthAbierto(true);
       return;
     }
     const existe = favoritos.some((item) => item.id === productoId);
@@ -88,160 +143,141 @@ export default function App() {
       }
       await cargarFavoritos();
       setError('');
+      setToast(existe ? 'Quitado de favoritos' : 'Guardado en favoritos');
     } catch (fallo) {
       setError(fallo.message);
     }
   }
 
-  const categorias = [...new Set(productos.map((producto) => producto.categoria))];
-  const esFavorito = (id) => favoritos.some((item) => item.id === id);
-  const filtros = (
-    <div className="filtros" role="group" aria-label="Filtrar por categoria">
-      <button
-        type="button"
-        className={categoria === '' ? 'chip chip--activo' : 'chip'}
-        onClick={() => setCategoria('')}
-      >
-        Todos
-      </button>
-      {categorias.map((nombre) => (
-        <button
-          key={nombre}
-          type="button"
-          className={categoria === nombre ? 'chip chip--activo' : 'chip'}
-          onClick={() => setCategoria(nombre)}
-        >
-          {nombre}
-        </button>
-      ))}
-    </div>
-  );
+  function agregarAlCarrito(producto) {
+    if (!producto?.id) return;
+    setCarrito((actual) => {
+      const existente = actual.find((item) => item.id === producto.id);
+      if (existente) {
+        return actual.map((item) => (
+          item.id === producto.id ? { ...item, qty: item.qty + 1 } : item
+        ));
+      }
+      return [...actual, { id: producto.id, qty: 1 }];
+    });
+    setToast(`${producto.nombre} añadido`);
+  }
+
+  function cambiarCantidad(productoId, delta) {
+    setCarrito((actual) => actual
+      .map((item) => (item.id === productoId ? { ...item, qty: item.qty + delta } : item))
+      .filter((item) => item.qty > 0));
+  }
+
+  function finalizarPedido() {
+    setCarrito([]);
+    setCarritoAbierto(false);
+    setToast('Pedido confirmado (demo)');
+  }
 
   return (
     <>
-      <Header usuario={usuario} onLogout={cerrarSesion} />
-      <main className="contenido">
+      <Header
+        cartCount={cartCount}
+        usuario={usuario}
+        onOpenCart={() => setCarritoAbierto(true)}
+        onOpenAuth={() => setAuthAbierto(true)}
+        onLogout={cerrarSesion}
+      />
+
+      <main className="wrap">
         {error && <p className="error" role="alert">{error}</p>}
 
-        {cargando ? (
+        <div className="hero-head">
+          <div>
+            <div className="kicker">Suplementos de precisión</div>
+            <h1>Rendimiento<br /><em>sin excusas.</em></h1>
+          </div>
+          <p>
+            Catálogo público, favoritos por usuario y una composición visual pensada para
+            entrenar, recuperar y volver a darlo todo.
+          </p>
+        </div>
+
+        {catalogo.length > 0 ? (
+          <BentoGrid productos={catalogo} onQuickAdd={agregarAlCarrito} />
+        ) : (
           <p className="panel__texto">Cargando productos...</p>
-        ) : productos.length === 0 ? (
-          <p className="panel__texto">No hay productos para mostrar.</p>
-        ) : categoria !== '' || productos.length < 5 ? (
-          <section id="catalogo" className="catalogo-filtrado" aria-label="Catalogo filtrado">
-            {filtros}
-            <div className="bento">
-              {productos.map((producto) => (
+        )}
+
+        <FilterToolbar
+          categorias={categorias}
+          categoria={categoria}
+          query={query}
+          onCategoria={setCategoria}
+          onQuery={setQuery}
+        />
+
+        <section id="catalogo">
+          <div className="section-head">
+            <h2>Catálogo</h2>
+            <span>{resultados.length} resultados</span>
+          </div>
+
+          {cargando ? (
+            <p className="panel__texto">Cargando productos...</p>
+          ) : resultados.length === 0 ? (
+            <p className="panel__texto">No hay productos para mostrar.</p>
+          ) : (
+            <div className="product-grid">
+              {resultados.map((producto) => (
                 <ProductCard
                   key={producto.id}
                   producto={producto}
-                  esFavorito={esFavorito(producto.id)}
+                  esFavorito={favoritos.some((item) => item.id === producto.id)}
                   onToggle={alternarFavorito}
+                  onDetalle={setProductoDetalle}
+                  onAgregar={agregarAlCarrito}
                 />
               ))}
             </div>
-          </section>
-        ) : (
-          <div className="marco-bento" id="catalogo">
-            <aside className="bloque-marca" aria-label="Marca y filtros">
-              <div className="marca">
-                <span className="marca__logo" aria-hidden="true">CF</span>
-                <span className="marca__nombre">Catalogo Fit</span>
-              </div>
-              <p className="marca__subtitulo">Equipo y suplementos</p>
-              <h2 className="marca__titulo">Entrena junto a tu mejor equipo.</h2>
-              <p className="marca__texto">
-                Explora la linea de suplementos, filtra por objetivo y guarda tus favoritos.
-              </p>
-              {filtros}
-              <a className="pill pill--clara" href="#bloques">Ver catalogo</a>
+          )}
+        </section>
 
-              <div className="marca__inferior">
-                <div className="retrato">
-                  <img src={imagenProducto(productos[0])} alt={`Envase de ${productos[0].nombre}`} />
-                  <span className="retrato__etiqueta">
-                    Pick 5 / 195 <i aria-hidden="true" />
-                  </span>
-                </div>
-                <div className="arco" aria-hidden="true" />
-                <div className="marca__nota">
-                  <strong>Somos Catalogo Fit</strong>
-                  <p>Suplementos pensados para hipertrofia, recuperacion y energia.</p>
-                  <a href="#favoritos">Conoce la historia ↗</a>
-                </div>
-              </div>
-            </aside>
-
-            <div className="bloques-derecha" id="bloques">
-              <section className="bloque-lila" aria-label="Destacado">
-                <nav className="bloque-lila__nav" aria-label="Navegacion del destacado">
-                  <a href="#catalogo">Producto</a>
-                  <a href="#catalogo">Historia</a>
-                  <a href="#bloques">Beneficios</a>
-                  <a href="#favoritos">Contacto</a>
-                  <a className="pill pill--clara" href="#acceso">Registro</a>
-                </nav>
-                <div className="bloque-lila__contenido">
-                  <img src={imagenProducto(productos[1])} alt={`Envase de ${productos[1].nombre}`} />
-                  <div className="bloque-lila__texto">
-                    <h3>Entrena <strong>en todas partes</strong></h3>
-                    <p>Catalogo, favoritos y seguimiento en un solo lugar.</p>
-                    <a className="pill pill--lima" href="#catalogo">Ver catalogo</a>
-                  </div>
-                </div>
-              </section>
-
-              <div className="fila fila--media">
-                <ProductCard
-                  producto={productos[2]}
-                  esFavorito={esFavorito(productos[2].id)}
-                  onToggle={alternarFavorito}
-                  variante="foto"
-                />
-                <ProductCard
-                  producto={productos[2]}
-                  esFavorito={esFavorito(productos[2].id)}
-                  onToggle={alternarFavorito}
-                  variante="callout"
-                />
-                <ProductCard
-                  producto={productos[3]}
-                  esFavorito={esFavorito(productos[3].id)}
-                  onToggle={alternarFavorito}
-                  variante="violeta"
-                />
-              </div>
-
-              <div className="fila fila--inferior">
-                <ProductCard
-                  producto={productos[0]}
-                  esFavorito={esFavorito(productos[0].id)}
-                  onToggle={alternarFavorito}
-                  variante="naranja"
-                />
-                <ProductCard
-                  producto={productos[4]}
-                  esFavorito={esFavorito(productos[4].id)}
-                  onToggle={alternarFavorito}
-                  variante="malva"
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="utilidades">
-          <div id="favoritos">
-            <FavoritesPanel favoritos={favoritos} onQuitar={alternarFavorito} usuario={usuario} />
-          </div>
-          <div id="acceso">
-            {!usuario && <AuthForm onAutenticar={autenticar} error="" />}
-          </div>
-        </div>
+        <FavoritesPanel
+          favoritos={favoritos}
+          usuario={usuario}
+          onQuitar={alternarFavorito}
+          onAgregar={agregarAlCarrito}
+          onAcceder={() => setAuthAbierto(true)}
+        />
       </main>
-      <footer className="pie">
-        <p>Catalogo Fit · Proyecto academico de API REST con JWT</p>
-      </footer>
+
+      <Footer />
+
+      <CartDrawer
+        open={carritoAbierto}
+        carrito={carrito}
+        productos={catalogo}
+        usuario={usuario}
+        onClose={() => setCarritoAbierto(false)}
+        onQty={cambiarCantidad}
+        onCheckout={finalizarPedido}
+        onOpenAuth={() => setAuthAbierto(true)}
+        onLogout={cerrarSesion}
+      />
+
+      <AuthModal
+        open={authAbierto}
+        usuario={usuario}
+        error={error}
+        onClose={() => setAuthAbierto(false)}
+        onAutenticar={autenticar}
+        onLogout={cerrarSesion}
+      />
+
+      <MacroModal
+        producto={productoDetalle}
+        onClose={() => setProductoDetalle(null)}
+        onAgregar={agregarAlCarrito}
+      />
+
+      <Toast message={toast} />
     </>
   );
 }

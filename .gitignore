@@ -18,6 +18,8 @@ dist/
 build/
 coverage/
 
+entrega/
+
 # Editores / SO
 .vscode/
 .idea/

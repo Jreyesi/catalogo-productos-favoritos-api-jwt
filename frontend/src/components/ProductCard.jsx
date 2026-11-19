@@ -1,100 +1,37 @@
+import { metadatosProducto } from '../data/productos.js';
 import { imagenProducto } from '../productImages.js';
+import { formatPrice } from '../utils/formatPrice.js';
 
-function BotonFavorito({ producto, esFavorito, onToggle, className = '' }) {
-  return (
-    <button
-      type="button"
-      className={`marcador ${esFavorito ? 'marcador--activo' : ''} ${className}`}
-      onClick={() => onToggle(producto.id)}
-      aria-pressed={esFavorito}
-    >
-      {esFavorito ? 'Guardado' : 'Favorito'}
-    </button>
-  );
-}
-
-export default function ProductCard({ producto, esFavorito, onToggle, variante = 'normal' }) {
-  const imagen = imagenProducto(producto);
-  const nombre = producto?.nombre ?? 'Producto';
-  const categoria = producto?.categoria ?? 'Catalogo';
-  const favorito = (
-    <BotonFavorito producto={producto} esFavorito={esFavorito} onToggle={onToggle} />
-  );
-
-  if (variante === 'foto') {
-    return (
-      <article className="pieza pieza--foto">
-        <img src={imagen} alt={`Envase de ${nombre}`} loading="lazy" />
-        <span className="pieza__etiqueta">{categoria}</span>
-        {favorito}
-      </article>
-    );
-  }
-
-  if (variante === 'callout') {
-    return (
-      <article className="pieza pieza--callout">
-        <span className="pieza__amplio">Nuestro producto</span>
-        <strong>{nombre}</strong>
-        <span className="pieza__detalle">{categoria}</span>
-        {favorito}
-        <span className="pieza__flecha" aria-hidden="true">↗</span>
-      </article>
-    );
-  }
-
-  if (variante === 'violeta') {
-    return (
-      <article className="pieza pieza--violeta">
-        <div className="pieza__cabecera">
-          <strong>{nombre}</strong>
-          <span>{categoria} ↗</span>
-        </div>
-        <img src={imagen} alt={`Envase de ${nombre}`} loading="lazy" />
-        {favorito}
-      </article>
-    );
-  }
-
-  if (variante === 'naranja') {
-    return (
-      <article className="pieza pieza--naranja">
-        <strong>Unete si quieres mas energia !</strong>
-        <div className="pieza__acciones">
-          <BotonFavorito producto={producto} esFavorito={esFavorito} onToggle={onToggle} className="marcador--oscuro" />
-          <a href="#favoritos">Ver favoritos ↗</a>
-        </div>
-      </article>
-    );
-  }
-
-  if (variante === 'malva') {
-    return (
-      <article className="pieza pieza--malva">
-        <div className="pieza__marco">
-          <span className="pieza__badge">CF</span>
-          <img src={imagen} alt={`Envase de ${nombre}`} loading="lazy" />
-        </div>
-        <span className="pieza__rol">{categoria} →</span>
-        {favorito}
-      </article>
-    );
-  }
+export default function ProductCard({ producto, esFavorito, onToggle, onDetalle, onAgregar }) {
+  const meta = metadatosProducto(producto);
 
   return (
-    <article className="tarjeta">
-      <div className="tarjeta__visual">
-        <img src={imagen} alt={`Envase de ${nombre}`} loading="lazy" />
+    <article className="product">
+      <img src={imagenProducto(producto)} alt={`Envase de ${producto.nombre}`} loading="lazy" />
+      <div className="body">
+        <span className="cat">{producto.categoria}</span>
+        <h4>{producto.nombre}</h4>
+        <p className="desc">{producto.descripcion}</p>
+        <p className="desc">{meta.protein} · {meta.servings}</p>
+        <div className="row">
+          <span className="price">{formatPrice(producto.precio)}</span>
+          <div className="actions">
+            <button
+              className={`icon-btn ${esFavorito ? 'on' : ''}`}
+              type="button"
+              title={esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+              aria-pressed={esFavorito}
+              onClick={() => onToggle(producto.id)}
+            >
+              ♥
+            </button>
+            <button className="icon-btn" type="button" title="Ver macros" onClick={() => onDetalle(producto)}>
+              i
+            </button>
+          </div>
+        </div>
+        <button className="add-btn" type="button" onClick={() => onAgregar(producto)}>Añadir al carrito</button>
       </div>
-      <header className="tarjeta__cabecera">
-        <span className="etiqueta">{categoria}</span>
-        <h3>{nombre}</h3>
-      </header>
-      <p className="tarjeta__descripcion">{producto?.descripcion}</p>
-      <footer className="tarjeta__pie">
-        <span className="precio">${Number(producto?.precio ?? 0).toFixed(2)}</span>
-        {favorito}
-      </footer>
     </article>
   );
 }

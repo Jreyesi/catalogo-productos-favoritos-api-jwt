@@ -17,6 +17,6 @@ const porNombre = [
 export function imagenProducto(producto) {
   if (porId[producto?.id]) return porId[producto.id];
   const nombre = producto?.nombre ?? '';
-  const encontrada = porNombre.find(([ patron ]) => patron.test(nombre));
+  const encontrada = porNombre.find(([patron]) => patron.test(nombre));
   return `/productos/${encontrada?.[1] ?? 'generico.svg'}`;
 }
