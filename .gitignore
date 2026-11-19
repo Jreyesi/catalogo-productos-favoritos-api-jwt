@@ -1,0 +1,25 @@
+# Node
+node_modules/
+npm-debug.log*
+.pnpm-debug.log*
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Bases de datos locales
+*.db
+*.sqlite
+*.sqlite3
+
+# Builds
+dist/
+build/
+coverage/
+
+# Editores / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
