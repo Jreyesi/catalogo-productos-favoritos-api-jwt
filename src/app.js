@@ -1,12 +1,14 @@
 const express = require('express');
 const productosRoutes = require('./routes/productos');
 const authRoutes = require('./routes/auth');
+const favoritosRoutes = require('./routes/favoritos');
 
 const app = express();
 
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes);
+app.use('/api/favoritos', favoritosRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
