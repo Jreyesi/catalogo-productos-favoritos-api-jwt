@@ -174,7 +174,8 @@ frontend/      aplicación React + Vite
 
 Cada funcionalidad se desarrolló en su propia rama, con un commit firmado por su autor
 real y un PR fusionado en `main`: catálogo (Miguel), autenticación (Jackson), favoritos
-(Miguel), pruebas (Jackson) y frontend (dos commits, uno por integrante).
+(Miguel), pruebas (Jackson) y frontend (cuatro commits: base y cierre de Jackson, bento
+de Miguel y ajuste final de Jackson).
 
 ## Recursos
 
