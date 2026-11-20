@@ -217,6 +217,7 @@
                 "exec": [
                   "pm.test('401 por credenciales incorrectas', function () {",
                   "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -244,6 +245,7 @@
                 "exec": [
                   "pm.test('401 sin token', function () {",
                   "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -401,6 +403,7 @@
                 "exec": [
                   "pm.test('404 para producto inexistente', function () {",
                   "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -515,6 +518,9 @@
                 "exec": [
                   "pm.test('422 por precio menor o igual a cero', function () {",
                   "  pm.response.to.have.status(422);",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.error).to.be.a('string');",
+                  "  pm.expect(j.detalles).to.be.an('array').that.is.not.empty;",
                   "});"
                 ]
               }
@@ -545,6 +551,9 @@
                 "exec": [
                   "pm.test('400 por campos obligatorios vacios', function () {",
                   "  pm.response.to.have.status(400);",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.error).to.be.a('string');",
+                  "  pm.expect(j.detalles).to.be.an('array').that.is.not.empty;",
                   "});"
                 ]
               }
@@ -575,6 +584,7 @@
                 "exec": [
                   "pm.test('403 por rol insuficiente', function () {",
                   "  pm.response.to.have.status(403);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -641,6 +651,7 @@
                 "exec": [
                   "pm.test('409 por favorito duplicado', function () {",
                   "  pm.response.to.have.status(409);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -671,6 +682,7 @@
                 "exec": [
                   "pm.test('404 por producto inexistente', function () {",
                   "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
@@ -747,6 +759,7 @@
                 "exec": [
                   "pm.test('404 y no afecta a A', function () {",
                   "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
                   "});"
                 ]
               }
