@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const usuarios = require('../data/usuarios');
 
 function requireAuth(req, res, next) {
   const cabecera = req.headers.authorization || '';
@@ -20,11 +21,19 @@ function requireAuth(req, res, next) {
   }
 }
 
-function requireAdmin(req, res, next) {
-  if (!req.usuario || req.usuario.rol !== 'admin') {
-    return res.status(403).json({ error: 'Se requiere rol de administrador' });
+async function requireAdmin(req, res, next) {
+  try {
+    if (!req.usuario) {
+      return res.status(403).json({ error: 'Se requiere rol de administrador' });
+    }
+    const usuario = await usuarios.buscarPorId(req.usuario.id);
+    if (!usuario || usuario.rol !== 'admin') {
+      return res.status(403).json({ error: 'Se requiere rol de administrador' });
+    }
+    next();
+  } catch (error) {
+    next(error);
   }
-  next();
 }
 
 module.exports = { requireAuth, requireAdmin };

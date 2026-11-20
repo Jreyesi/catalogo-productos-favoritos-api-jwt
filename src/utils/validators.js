@@ -1,8 +1,11 @@
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function esIdValido(valor) {
-  const id = Number(valor);
-  return Number.isInteger(id) && id > 0;
+  if (typeof valor !== 'string' && typeof valor !== 'number') return false;
+  const texto = String(valor);
+  if (!/^\d+$/.test(texto)) return false;
+  const id = Number(texto);
+  return Number.isSafeInteger(id) && id >= 1 && id <= 2147483647;
 }
 
 function validarRegistro(cuerpo) {
@@ -54,11 +57,16 @@ function validarProducto(cuerpo) {
   const descripcion = texto('descripcion', 2000);
   const categoria = texto('categoria', 80);
 
-  const precio = Number(cuerpo.precio);
-  if (cuerpo.precio === undefined || cuerpo.precio === null || cuerpo.precio === '' || Number.isNaN(precio)) {
+  const precioCrudo = cuerpo.precio;
+  const esNumero = typeof precioCrudo === 'number' && Number.isFinite(precioCrudo);
+  const esTexto = typeof precioCrudo === 'string' && /^\d+(?:\.\d+)?$/.test(precioCrudo.trim());
+  const precio = Number(precioCrudo);
+  if (!esNumero && !esTexto) {
     errores.push({ campo: 'precio', mensaje: 'Debe ser un número' });
   } else if (precio <= 0) {
     errores.push({ campo: 'precio', mensaje: 'Debe ser mayor que cero', status: 422 });
+  } else if (precio > 99999999.99) {
+    errores.push({ campo: 'precio', mensaje: 'Debe ser como máximo 99999999.99', status: 422 });
   }
 
   const status = errores.some((e) => e.status === 422) && errores.length === 1 ? 422 : 400;

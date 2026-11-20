@@ -26,6 +26,7 @@ export default function App() {
   const [authAbierto, setAuthAbierto] = useState(false);
   const [productoDetalle, setProductoDetalle] = useState(null);
   const [toast, setToast] = useState('');
+  const [guardandoFavorito, setGuardandoFavorito] = useState(false);
 
   const cargarFavoritos = useCallback(async () => {
     if (!localStorage.getItem('token')) {
@@ -35,6 +36,11 @@ export default function App() {
     try {
       setFavoritos(await api.listarFavoritos());
     } catch (fallo) {
+      if (fallo.status === 401) {
+        cerrarSesion('Sesión expirada');
+        setError('Sesión expirada, inicia sesión nuevamente');
+        return;
+      }
       setError(fallo.message);
     }
   }, []);
@@ -119,13 +125,14 @@ export default function App() {
     }
   }
 
-  function cerrarSesion() {
+  function cerrarSesion(mensaje) {
+    const texto = typeof mensaje === 'string' ? mensaje : 'Sesión cerrada';
     localStorage.removeItem('token');
     localStorage.removeItem('usuario');
     setUsuario(null);
     setFavoritos([]);
     setAuthAbierto(false);
-    setToast('Sesión cerrada');
+    setToast(texto);
   }
 
   async function alternarFavorito(productoId) {
@@ -134,7 +141,9 @@ export default function App() {
       setAuthAbierto(true);
       return;
     }
+    if (guardandoFavorito) return;
     const existe = favoritos.some((item) => item.id === productoId);
+    setGuardandoFavorito(true);
     try {
       if (existe) {
         await api.quitarFavorito(productoId);
@@ -145,7 +154,14 @@ export default function App() {
       setError('');
       setToast(existe ? 'Quitado de favoritos' : 'Guardado en favoritos');
     } catch (fallo) {
+      if (fallo.status === 401) {
+        cerrarSesion('Sesión expirada');
+        setError('Sesión expirada, inicia sesión nuevamente');
+        return;
+      }
       setError(fallo.message);
+    } finally {
+      setGuardandoFavorito(false);
     }
   }
 

@@ -26,3 +26,4 @@ CREATE TABLE IF NOT EXISTS favoritos (
 
 CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos (categoria);
 CREATE INDEX IF NOT EXISTS idx_favoritos_usuario ON favoritos (usuario_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_usuarios_email_ci ON usuarios (LOWER(email));

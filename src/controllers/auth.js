@@ -18,7 +18,7 @@ async function registro(req, res, next) {
     const passwordHash = await bcrypt.hash(datos.password, 10);
     const usuario = await usuarios.crear({
       nombre: datos.nombre,
-      email: datos.email,
+      email: datos.email.toLowerCase(),
       passwordHash,
       rol: 'usuario'
     });

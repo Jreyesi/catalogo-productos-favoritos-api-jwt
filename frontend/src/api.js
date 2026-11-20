@@ -14,7 +14,9 @@ async function pedir(ruta, opciones = {}) {
   const datos = texto ? JSON.parse(texto) : null;
 
   if (!respuesta.ok) {
-    throw new Error(datos?.error || 'Error al procesar la solicitud');
+    const error = new Error(datos?.error || 'Error al procesar la solicitud');
+    error.status = respuesta.status;
+    throw error;
   }
   return datos;
 }

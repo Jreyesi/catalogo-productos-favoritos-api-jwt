@@ -3,6 +3,9 @@ const { esIdValido, validarProducto } = require('../utils/validators');
 
 async function listar(req, res, next) {
   try {
+    if (req.query.categoria !== undefined && typeof req.query.categoria !== 'string') {
+      return res.status(400).json({ error: 'categoria debe ser un texto' });
+    }
     const categoria = typeof req.query.categoria === 'string' ? req.query.categoria.trim() : undefined;
     const items = await productos.listar(categoria);
     res.status(200).json(items);

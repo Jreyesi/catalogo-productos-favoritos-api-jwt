@@ -25,6 +25,18 @@ app.get('*', (req, res, next) => {
 });
 
 app.use((error, req, res, next) => {
+  if (error.status === 400 || error.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'JSON inválido o petición mal formada' });
+  }
+  if (error.code === '22P02' || error.code === '22003') {
+    return res.status(400).json({ error: 'Parámetro inválido' });
+  }
+  if (error.code === '23505') {
+    return res.status(409).json({ error: 'Recurso duplicado' });
+  }
+  if (error.code === '23503') {
+    return res.status(404).json({ error: 'Referencia inexistente' });
+  }
   console.error(error.message);
   res.status(500).json({ error: 'Error interno del servidor' });
 });
