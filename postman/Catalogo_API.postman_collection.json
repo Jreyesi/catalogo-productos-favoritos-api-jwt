@@ -285,6 +285,7 @@
                 "exec": [
                   "pm.test('401 con token vencido', function () {",
                   "  pm.response.to.have.status(401);",
+                  "  pm.expect(pm.response.json().error).to.eql('El token ha expirado');",
                   "});"
                 ]
               }
