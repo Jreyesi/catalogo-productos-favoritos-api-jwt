@@ -889,19 +889,85 @@
       ]
     },
     {
-      "name": "05 - Persistencia",
+      "name": "05 - Persistencia antes del reinicio",
       "item": [
         {
-          "name": "Consultar catalogo tras reiniciar Node",
+          "name": "Crear Producto Persistencia como admin",
           "event": [
             {
               "listen": "test",
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('200 y al menos 5 productos persisten', function () {",
+                  "pm.test('201 y Producto Persistencia creado', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const j = pm.response.json();",
+                  "  pm.expect(j.nombre).to.eql('Producto Persistencia');",
+                  "  pm.expect(j.id).to.be.a('number');",
+                  "  pm.environment.set('idProductoPersistencia', j.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\":\"Producto Persistencia\",\"descripcion\":\"Creado antes de reiniciar Node\",\"categoria\":\"Persistencia\",\"precio\":29.9}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/productos"
+          },
+          "response": []
+        },
+        {
+          "name": "Agregar Producto Persistencia a favoritos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('201 y favorito de persistencia creado', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(pm.response.json().producto.id).to.eql(Number(pm.environment.get('idProductoPersistencia')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUsuario}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"productoId\":{{idProductoPersistencia}}}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/favoritos"
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar favorito antes del reinicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y Producto Persistencia esta en favoritos', function () {",
                   "  pm.response.to.have.status(200);",
-                  "  pm.expect(pm.response.json().length).to.be.at.least(5);",
+                  "  const id = Number(pm.environment.get('idProductoPersistencia'));",
+                  "  pm.expect(pm.response.json().some(p => p.id === id && p.nombre === 'Producto Persistencia')).to.be.true;",
                   "});"
                 ]
               }
@@ -909,8 +975,66 @@
           ],
           "request": {
             "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/productos"
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUsuario}}" }],
+            "url": "{{baseUrl}}/favoritos"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Persistencia despues del reinicio",
+      "item": [
+        {
+          "name": "Login usuario A tras reinicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y usuario A inicia sesion de nuevo', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().token).to.be.a('string');",
+                  "  pm.environment.set('tokenUsuarioReiniciado', pm.response.json().token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\":\"{{emailA}}\",\"password\":\"clave12345\"}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar favoritos tras reinicio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y el favorito persiste tras reiniciar Node', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const id = Number(pm.environment.get('idProductoPersistencia'));",
+                  "  pm.expect(pm.response.json().some(p => p.id === id && p.nombre === 'Producto Persistencia')).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUsuarioReiniciado}}" }],
+            "url": "{{baseUrl}}/favoritos"
           },
           "response": []
         }
