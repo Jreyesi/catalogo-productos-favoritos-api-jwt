@@ -160,8 +160,11 @@ contiene secretos.
 
 ### Persistencia
 
-Detén Node (`Ctrl+C`), vuelve a `npm start` y repite `GET /api/productos`: los 5
-productos siguen ahí porque están en el volumen de PostgreSQL, no en memoria.
+La colección crea `Producto Persistencia` con el administrador y lo agrega a favoritos
+con el usuario A antes del reinicio (`05 - Persistencia antes del reinicio`). El runner
+reinicia Node en el puerto 3100 y verifica, con un nuevo login de A, que el producto
+sigue en `GET /favoritos` (`06 - Persistencia despues del reinicio`). No depende de los
+5 productos de la semilla.
 
 ## Estructura
 
