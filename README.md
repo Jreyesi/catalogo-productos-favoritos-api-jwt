@@ -148,8 +148,15 @@ Con la API en ejecución:
 npm run test:postman
 ```
 
-El script `postman/run-tests.ps1` lee `.env` e inyecta las credenciales como variables
-de entorno de Newman, por lo que el entorno versionado no contiene secretos.
+En Linux o macOS:
+
+```bash
+npm run test:postman:sh
+```
+
+Los scripts `postman/run-tests.ps1` y `postman/run-tests.sh` leen `.env` e inyectan las
+credenciales como variables de entorno de Newman, por lo que el entorno versionado no
+contiene secretos.
 
 ### Persistencia
 
