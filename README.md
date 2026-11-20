@@ -135,7 +135,7 @@ tupla `(usuario_id, producto_id)` es única, por lo que no hay duplicados.
 
 1. Importar `postman/Catalogo_API.postman_collection.json` y
    `postman/Entorno.postman_environment.json`.
-2. Completar `adminPassword` en el entorno con el valor local de `ADMIN_PASSWORD`.
+2. Completar `adminPassword` y `jwtSecret` en el entorno con los valores locales de `ADMIN_PASSWORD` y `JWT_SECRET` de `.env`.
 3. Ejecutar la colección completa (29 peticiones, 30 aserciones). Cubre registro,
    duplicados, login correcto/incorrecto, token vencido, sin token, 403 por rol, CRUD,
    filtros, validaciones, favoritos, aislamiento A/B y persistencia.
