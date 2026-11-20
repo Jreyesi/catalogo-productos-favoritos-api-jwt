@@ -456,6 +456,29 @@
           "response": []
         },
         {
+          "name": "Consultar producto creado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 y producto creado es consultable', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().id).to.eql(Number(pm.environment.get('idProductoNuevo')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/productos/{{idProductoNuevo}}"
+          },
+          "response": []
+        },
+        {
           "name": "Actualizar producto como admin",
           "event": [
             {
@@ -504,6 +527,29 @@
           "request": {
             "method": "DELETE",
             "header": [{ "key": "Authorization", "value": "Bearer {{tokenAdmin}}" }],
+            "url": "{{baseUrl}}/productos/{{idProductoNuevo}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar producto eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('404 y error al consultar producto eliminado', function () {",
+                  "  pm.response.to.have.status(404);",
+                  "  pm.expect(pm.response.json().error).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
             "url": "{{baseUrl}}/productos/{{idProductoNuevo}}"
           },
           "response": []
